@@ -67,6 +67,18 @@ enum EasyLoadingMaskType {
   custom,
 }
 
+enum EasyLoadingType {
+  show,
+  showProgress,
+  showSuccess,
+  showError,
+  showInfo,
+  showToast,
+  dismiss,
+
+
+}
+
 /// loading indicator type. see [https://github.com/jogboms/flutter_spinkit#-showcase]
 enum EasyLoadingIndicatorType {
   fadingCircle,
@@ -105,6 +117,8 @@ typedef EasyLoadingStatusCallback = void Function(EasyLoadingStatus status);
 class EasyLoading {
   /// loading style, default [EasyLoadingStyle.dark].
   late EasyLoadingStyle loadingStyle;
+  /// loading type, default [EasyLoadingType.dismiss]
+  late EasyLoadingType loadingType;
 
   /// loading indicator type, default [EasyLoadingIndicatorType.fadingCircle].
   late EasyLoadingIndicatorType indicatorType;
@@ -189,6 +203,7 @@ class EasyLoading {
 
   Widget? _w;
 
+  EasyLoadingType get currentLoadingType => loadingType;
   EasyLoadingOverlayEntry? overlayEntry;
   GlobalKey<EasyLoadingContainerState>? _key;
   GlobalKey<EasyLoadingProgressState>? _progressKey;
@@ -206,6 +221,7 @@ class EasyLoading {
 
   EasyLoading._internal() {
     /// set deafult value
+    loadingType = EasyLoadingType.dismiss;
     loadingStyle = EasyLoadingStyle.dark;
     indicatorType = EasyLoadingIndicatorType.fadingCircle;
     maskType = EasyLoadingMaskType.none;
@@ -250,6 +266,7 @@ class EasyLoading {
     bool? dismissOnTap,
   }) {
     Widget w = indicator ?? (_instance.indicatorWidget ?? LoadingIndicator());
+    _instance.loadingType = EasyLoadingType.show;
     return _instance._show(
       status: status,
       maskType: maskType,
@@ -284,6 +301,7 @@ class EasyLoading {
         key: _progressKey,
         value: value,
       );
+      instance.loadingType = EasyLoadingType.showProgress;
       _instance._show(
         status: status,
         maskType: maskType,
@@ -311,6 +329,7 @@ class EasyLoading {
           color: EasyLoadingTheme.indicatorColor,
           size: EasyLoadingTheme.indicatorSize,
         );
+    instance.loadingType = EasyLoadingType.showSuccess;
     return _instance._show(
       status: status,
       duration: duration ?? EasyLoadingTheme.displayDuration,
@@ -333,6 +352,7 @@ class EasyLoading {
           color: EasyLoadingTheme.indicatorColor,
           size: EasyLoadingTheme.indicatorSize,
         );
+    instance.loadingType = EasyLoadingType.showError;
     return _instance._show(
       status: status,
       duration: duration ?? EasyLoadingTheme.displayDuration,
@@ -355,6 +375,7 @@ class EasyLoading {
           color: EasyLoadingTheme.indicatorColor,
           size: EasyLoadingTheme.indicatorSize,
         );
+    instance.loadingType = EasyLoadingType.showInfo;
     return _instance._show(
       status: status,
       duration: duration ?? EasyLoadingTheme.displayDuration,
@@ -372,6 +393,7 @@ class EasyLoading {
     EasyLoadingMaskType? maskType,
     bool? dismissOnTap,
   }) {
+    instance.loadingType = EasyLoadingType.showToast;
     return _instance._show(
       status: status,
       duration: duration ?? EasyLoadingTheme.displayDuration,
@@ -387,6 +409,7 @@ class EasyLoading {
   }) {
     // cancel timer
     _instance._cancelTimer();
+    instance.loadingType = EasyLoadingType.dismiss;
     return _instance._dismiss(animation);
   }
 
@@ -458,6 +481,8 @@ class EasyLoading {
     _progressKey = null;
     if (_key != null) await dismiss(animation: false);
 
+
+    instance.loadingType = EasyLoadingType.show;
     Completer<void> completer = Completer<void>();
     _key = GlobalKey<EasyLoadingContainerState>();
     _w = EasyLoadingContainer(
@@ -501,6 +526,7 @@ class EasyLoading {
     _cancelTimer();
     _markNeedsBuild();
     _callback(EasyLoadingStatus.dismiss);
+    instance.loadingType = EasyLoadingType.dismiss;
   }
 
   void _callback(EasyLoadingStatus status) {
