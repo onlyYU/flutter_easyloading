@@ -482,7 +482,6 @@ class EasyLoading {
     if (_key != null) await dismiss(animation: false);
 
 
-    instance.loadingType = EasyLoadingType.show;
     Completer<void> completer = Completer<void>();
     _key = GlobalKey<EasyLoadingContainerState>();
     _w = EasyLoadingContainer(
